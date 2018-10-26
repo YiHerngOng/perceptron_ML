@@ -32,7 +32,8 @@ class Perceptron():
 		# pdb.set_trace()
 		# for i in range(iteration):
 		# 	print i
-		self.acc = []
+		self.acc_valid = []
+		self.acc_train = []
 		with open('valid1.csv', 'wb') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')
 			for i in range(iteration):
@@ -52,6 +53,7 @@ class Perceptron():
 						y_pred_train = 1
 					if y_pred_train == self.y_train[m]:
 						accuracy_train = accuracy_train + 1
+				accuracies_train = float(accuracy_train) / float(len(self.y_train))				
 				# Determine validation accuracy
 				for m, n in enumerate(self.x_valid):
 					y_pred_valid = float(np.dot(w_dec,self.x_valid[m]))
@@ -63,9 +65,8 @@ class Perceptron():
 						accuracy_valid = accuracy_valid + 1
 						# writer.writerow([y_pred_valid, y_pred, self.y_valid[m]])
 				accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
-				accuracies_train = float(accuracy_train) / float(len(self.y_train))
-				writer.writerow([accuracies])
-				self.acc.append(accuracies)
+				writer.writerow([accuracies_valid, accuracies_train])
+				self.acc.append([accuracies_valid, accuracies_train])
 
 	def average_perceptron(self):
 		pass
