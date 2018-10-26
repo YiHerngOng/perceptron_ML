@@ -41,7 +41,18 @@ class Perceptron():
 					if (self.y_train[j]*u) <= 0:
 						# print self.y_train[j]*u
 						w_dec = w_dec + (self.y_train[j]*self.x_train[j])
-				accuracy = 0				
+				accuracy_valid = 0
+				accuracy_train = 0
+				# Determine training accuracy
+				for a in xrange(len(self.x_train)):
+					y_pred_train = np.dot(w_dec, self.x_train[a])
+					if y_pred_train < 0.0:
+						y_pred_train = -1
+					elif y_pred_train > 0.0:
+						y_pred_train = 1
+					if y_pred_train == self.y_train[m]:
+						accuracy_train = accuracy_train + 1
+				# Determine validation accuracy
 				for m, n in enumerate(self.x_valid):
 					y_pred_valid = float(np.dot(w_dec,self.x_valid[m]))
 					if y_pred_valid < 0.0:	# could be 5 
@@ -49,9 +60,10 @@ class Perceptron():
 					elif y_pred_valid >= 0.0: # could be 3
 						y_pred = 1
 					if y_pred == self.y_valid[m]:
-						accuracy = accuracy + 1
+						accuracy_valid = accuracy_valid + 1
 						# writer.writerow([y_pred_valid, y_pred, self.y_valid[m]])
-				accuracies = float(accuracy) / float(len(self.y_valid))
+				accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
+				accuracies_train = float(accuracy_train) / float(len(self.y_train))
 				writer.writerow([accuracies])
 				self.acc.append(accuracies)
 
