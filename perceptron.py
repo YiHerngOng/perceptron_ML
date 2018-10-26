@@ -55,6 +55,8 @@ class Perceptron():
 				writer.writerow([accuracies])
 				self.acc.append(accuracies)
 
+	def average_perceptron(self):
+		pass
 if __name__ == '__main__':
 	perceptron = Perceptron('pa2_train.csv', 'pa2_valid.csv')
 	# print perceptron.data
