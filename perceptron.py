@@ -51,7 +51,7 @@ class Perceptron():
 						y_pred_train = -1
 					elif y_pred_train > 0.0:
 						y_pred_train = 1
-					if y_pred_train == self.y_train[m]:
+					if y_pred_train == self.y_train[a]:
 						accuracy_train = accuracy_train + 1
 				accuracies_train = float(accuracy_train) / float(len(self.y_train))				
 				# Determine validation accuracy
@@ -66,7 +66,8 @@ class Perceptron():
 						# writer.writerow([y_pred_valid, y_pred, self.y_valid[m]])
 				accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
 				writer.writerow([accuracies_valid, accuracies_train])
-				self.acc.append([accuracies_valid, accuracies_train])
+				self.acc_valid.append(accuracies_valid)
+				self.acc_train.append(accuracies_train)
 
 	def average_perceptron(self):
 		pass
