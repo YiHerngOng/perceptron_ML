@@ -120,6 +120,22 @@ class Perceptron():
 				self.acc_train_avg.append(accuracies_train)
 				writer.writerow([accuracies_valid, accuracies_train])
 
+	def kernel_perceptron(self, p):
+		K = []
+		
+		alpha = np.zeros(len(self.x_train))
+		for i in xrange(len(self.x_train)):
+			temp = []
+			for j in xrange(len(self.x_train)):
+				temp.append(sign_function(self.x_train[i], self.x_train[j]))
+			K.append(temp)
+		iteration = 15
+		for k in range(iteration):
+			for a in xrange(len(self.x_train)):
+				u = 
+
+
+		pass
 
 	# determine whether it's 1 (3) or -1 (5)
 	# prediction function
@@ -130,7 +146,8 @@ class Perceptron():
 			y = 1
 		return y
 
-
+	def kernel_function(self, x_i, x_j, p):
+		return (1 + np.dot(x_i, x_j))**p
 
 
 if __name__ == '__main__':
