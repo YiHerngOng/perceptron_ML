@@ -121,56 +121,68 @@ class Perceptron():
 				self.acc_train_avg.append(accuracies_train)
 				writer.writerow([accuracies_valid, accuracies_train])
 
-	def kernel_perceptron(self, p):
+	def kernel_perceptron(self):
 		K = []
 		
 		alpha = np.zeros(len(self.x_train))
+		alpha_dec = []
+		y_train_dec = []
+		y_valid_dec = []
 		for i in xrange(len(self.x_train)):
-			temp = []
-			for j in xrange(len(self.x_train)):
-				temp.append(self.kernel_function(self.x_train[i], self.x_train[j], p))
-			K.append(temp)
-		pdb.set_trace()
+			alpha_dec.append(Decimal(alpha[i]))
+			y_train_dec.append(Decimal(self.y_train[i]))
+		for j in xrange(len(self.x_valid)):
+			y_valid_dec.append(Decimal(self.y_valid[j]))
+
 		iteration = 15
+		# count = 0
 		# for k in range(iteration):
-		for a in xrange(len(self.x_train)):
-			for b in xrange(self.x_train):
-				u = u + (K[b][0]*alpha[b]*self.y_train[b])
-			if u < 0.0:
-				u_sign = -1
-			elif u >= 0.0:
-				u_sign = 1
-			if self.y_train[a]*u_sign <= 0:
-				alpha[a] = alpha[a] + 1
+		u = 0
+		p_arr = [1,2,3,7,15]
+		for h in xrange(len(p_arr)):
+			with open('valid_{}.csv'.format(p_arr[h]), 'wb') as csvfile:
+				writer = csv.writer(csvfile, delimiter=',')
+				for g in range(iteration):
+					for a in xrange(len(self.x_train)):
+						for b in xrange(len(self.x_train)):
+							u = u + (self.kernel_function(self.x_train[b], self.x_train[a], p_arr[h])*alpha_dec[b]*y_train_dec[b])
+							# count = count +1
+							# print count
+						if u < 0.0:
+							u_sign = -1
+						elif u >= 0.0:
+							u_sign = 1
+						if y_train_dec[a]*u_sign <= 0:
+							alpha_dec[a] = alpha_dec[a] + Decimal(1)
 
-		self.acc_valid_kern = []
-		self.acc_train_kern = []
+					self.acc_valid_kern = []
+					self.acc_train_kern = []
 
-		y_pred_train = 0
-		accuracy_train = 0
-		accuracy_valid = 0
-		for c in xrange(len(self.x_train)):
-			y_pred_train = 0
-			for d in xrange(len(self.x_train)):
-				y_pred_train = y_pred_train + self.y_train[c]*K[c][d]*alpha[d]
-			y_pred_train_sign = self.sign_function_2(y_pred_train)
-			if y_pred_train_sign == self.y_train[c]:
-				accuracy_train = accuracy_train + 1
-		accuracies_train = float(accuracy_train) / float(len(self.y_train))
+					y_pred_train = 0
+					accuracy_train = 0
+					accuracy_valid = 0
+					for c in xrange(len(self.x_train)):
+						y_pred_train = 0
+						for d in xrange(len(self.x_train)):
+							y_pred_train += y_train_dec[d]*self.kernel_function(self.x_train[d], self.x_train[c], p_arr[h])*alpha_dec[d]
+						y_pred_train_sign = self.sign_function_2(y_pred_train)
+						if y_pred_train_sign == y_train_dec[c]:
+							accuracy_train = accuracy_train + 1
+					accuracies_train = float(accuracy_train) / float(len(y_train_dec))
 
-		y_pred_valid = 0
-		accuracy_valid = 0
-		accuracy_train = 0
-		for e in xrange(len(self.x_valid)):
-			y_pred_valid = 0
-			for f in xrange(len(self.x_valid)):
-				y_pred_valid = y_pred_valid + self.y_valid[e]*K[e][f]*alpha[f]
-			y_pred_valid_sign = self.sign_function_2(y_pred_valid)
-			if y_pred_valid_sign == self.y_valid[c]:
-				accuracy_valid = accuracy_valid + 1
-		accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
-		self.acc_valid_kern.append(accuracies_valid)
-		self.acc_train_kern.append(accuracies_train)
+					y_pred_valid = 0
+					for e in xrange(len(self.x_valid)):
+						y_pred_valid = 0
+						for f in xrange(len(self.x_train)):
+							y_pred_valid += y_train_dec[f]*self.kernel_function(self.x_train[f], self.x_valid[e], p_arr[h])*alpha_dec[f]
+						y_pred_valid_sign = self.sign_function_2(y_pred_valid)
+						if y_pred_valid_sign == y_valid_dec[e]:
+							accuracy_valid = accuracy_valid + 1
+					accuracies_valid = float(accuracy_valid) / float(len(y_valid_dec))
+					self.acc_valid_kern.append(accuracies_valid)
+					self.acc_train_kern.append(accuracies_train)
+					writer.writerow([accuracies_valid, accuracies_train])
+
 
 
 	# determine whether it's 1 (3) or -1 (5)
@@ -197,4 +209,4 @@ if __name__ == '__main__':
 	# print perceptron.data
 	# perceptron.online_perceptron()
 	# perceptron.average_perceptron()
-	perceptron.kernel_perceptron(1)
+	perceptron.kernel_perceptron()
