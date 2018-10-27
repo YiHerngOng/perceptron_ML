@@ -130,6 +130,7 @@ class Perceptron():
 			for j in xrange(len(self.x_train)):
 				temp.append(self.kernel_function(self.x_train[i], self.x_train[j], p))
 			K.append(temp)
+		pdb.set_trace()
 		iteration = 15
 		# for k in range(iteration):
 		for a in xrange(len(self.x_train)):
@@ -163,7 +164,7 @@ class Perceptron():
 		for e in xrange(len(self.x_valid)):
 			y_pred_valid = 0
 			for f in xrange(len(self.x_valid)):
-				y_pred_valid = y_pred_valid + self.y_valid[c]*K[c][d]*alpha[d]
+				y_pred_valid = y_pred_valid + self.y_valid[e]*K[e][f]*alpha[f]
 			y_pred_valid_sign = self.sign_function_2(y_pred_valid)
 			if y_pred_valid_sign == self.y_valid[c]:
 				accuracy_valid = accuracy_valid + 1
