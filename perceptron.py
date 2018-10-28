@@ -125,62 +125,56 @@ class Perceptron():
 		K = []
 		
 		alpha = np.zeros(len(self.x_train))
+		K_train = np.zeros((len(self.x_train), len(self.x_train)))
+		K_valid = np.zeros((len(self.x_valid), len(self.x_valid)))
 		alpha_dec = []
 		y_train_dec = []
 		y_valid_dec = []
+
 		for i in xrange(len(self.x_train)):
 			alpha_dec.append(Decimal(alpha[i]))
 			y_train_dec.append(Decimal(self.y_train[i]))
 		for j in xrange(len(self.x_valid)):
 			y_valid_dec.append(Decimal(self.y_valid[j]))
 
-		iteration = 15
-		# count = 0
-		# for k in range(iteration):
-		u = 0
+		alpha_dec = np.array(alpha_dec)
+		y_train_dec = np.array(y_train_dec)
+		y_valid_dec = np.array(y_valid_dec)
+
 		p_arr = [1,2,3,7,15]
-		for h in xrange(len(p_arr)):
-			with open('valid_{}.csv'.format(p_arr[h]), 'wb') as csvfile:
-				writer = csv.writer(csvfile, delimiter=',')
-				for g in range(iteration):
-					for a in xrange(len(self.x_train)):
-						for b in xrange(len(self.x_train)):
-							u = u + (self.kernel_function(self.x_train[b], self.x_train[a], p_arr[h])*alpha_dec[b]*y_train_dec[b])
-							# count = count +1
-							# print count
-						if u < 0.0:
-							u_sign = -1
-						elif u >= 0.0:
-							u_sign = 1
-						if y_train_dec[a]*u_sign <= 0:
-							alpha_dec[a] = alpha_dec[a] + Decimal(1)
+		for p in p_arr:
+			for b in xrange(len(self.x_train)):
+				for c in xrange(len(self.x_train)):
+					# print 'K_train'
+					K_train[b, c] = self.kernel_function(self.x_train[b], self.x_train[c], p)
 
-					self.acc_valid_kern = []
-					self.acc_train_kern = []
+			for m in xrange(len(self.x_valid)):
+				for n in xrange(len(self.x_valid)):
+					# print 'K_valid'
+					K_valid[m,n] = self.kernel_function(self.x_valid[m], self.x_train[n], p)
 
-					y_pred_train = 0
-					accuracy_train = 0
-					accuracy_valid = 0
-					for c in xrange(len(self.x_train)):
-						y_pred_train = 0
-						for d in xrange(len(self.x_train)):
-							y_pred_train += y_train_dec[d]*self.kernel_function(self.x_train[d], self.x_train[c], p_arr[h])*alpha_dec[d]
-						y_pred_train_sign = self.sign_function_2(y_pred_train)
-						if y_pred_train_sign == y_train_dec[c]:
-							accuracy_train = accuracy_train + 1
-					accuracies_train = float(accuracy_train) / float(len(y_train_dec))
+			iteration = 15
+			# u = 0
+			for g in range(iteration):
+				print g
+				for a in xrange(len(self.x_train)):
+					u = np.sign(np.sum(K_train[:,a]*alpha_dec*np.transpose(y_train_dec)))
+					if y_train_dec[a]*u <= 0:
+						alpha_dec[a] += Decimal(1)
 
-					y_pred_valid = 0
-					for e in xrange(len(self.x_valid)):
-						y_pred_valid = 0
-						for f in xrange(len(self.x_train)):
-							y_pred_valid += y_train_dec[f]*self.kernel_function(self.x_train[f], self.x_valid[e], p_arr[h])*alpha_dec[f]
-						y_pred_valid_sign = self.sign_function_2(y_pred_valid)
-						if y_pred_valid_sign == y_valid_dec[e]:
-							accuracy_valid = accuracy_valid + 1
-					accuracies_valid = float(accuracy_valid) / float(len(y_valid_dec))
-					self.acc_valid_kern.append(accuracies_valid)
-					self.acc_train_kern.append(accuracies_train)
+				for c in xrange(len(self.x_train)):
+					y_pred_train = np.sign(np.sum(K_train[:,c]*alpha_dec*np.transpose(y_train_dec)))
+					if y_pred_train == y_train_dec[c]:
+						accuracy_train = accuracy_train + 1
+				accuracies_train = float(accuracy_train) / float(len(y_train_dec))
+
+				for e in xrange(len(self.x_valid)):
+					y_pred_valid = np.sign(np.sum(K_valid[:,e]*alpha_dec*np.transpose(y_train_dec))) 
+					if y_pred_valid == y_valid_dec[e]:
+						accuracy_valid = accuracy_valid + 1
+				accuracies_valid = float(accuracy_valid) / float(len(y_valid_dec))
+				with open('valid_{}.csv'.format(p), 'wb') as csvfile:
+					writer = csv.writer(csvfile, delimiter=',')
 					writer.writerow([accuracies_valid, accuracies_train])
 
 
