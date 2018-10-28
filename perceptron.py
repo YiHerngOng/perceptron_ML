@@ -22,158 +22,127 @@ class Perceptron():
 	def online_perceptron(self):
 		iteration = 15
 		w = np.zeros(len(self.x_train[0]))
-		w_dec = []
-		for a in xrange(len(w)):
-			try:
-				w_dec.append(Decimal(w[a]))
-			except:
-				raise TypeError
-		w_dec = np.array(w_dec)
-		# pdb.set_trace()
-		# for i in range(iteration):
-		# 	print i
-		self.acc_valid_online = []
-		self.acc_train_online = []
-		with open('valid1.csv', 'wb') as csvfile:
+
+		with open('validonline1.csv', 'wb') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')
 			for i in range(iteration):
 				for j, k in enumerate(self.x_train):
-					u = np.dot(w_dec, self.x_train[j])
+					u = np.dot(w, self.x_train[j])
 					if (self.y_train[j]*u) <= 0:
 						# print self.y_train[j]*u
-						w_dec = w_dec + (self.y_train[j]*self.x_train[j])
+						w = w + (self.y_train[j]*self.x_train[j])
 				accuracy_valid = 0
 				accuracy_train = 0
 
 				# Determine training accuracy
 				for a in xrange(len(self.x_train)):
-					y_pred_train = self.sign_function(w_dec, self.x_train[a])
+					y_pred_train = self.sign_function(w, self.x_train[a])
 					if y_pred_train == self.y_train[a]:
 						accuracy_train = accuracy_train + 1
 				accuracies_train = float(accuracy_train) / float(len(self.y_train))		
 
 				# Determine validation accuracy
 				for m, n in enumerate(self.x_valid):
-					y_pred_valid = self.sign_function(w_dec, self.x_train[m])
-					if y_pred == self.y_valid[m]:
+					y_pred_valid = self.sign_function(w, self.x_train[m])
+					if y_pred_valid == self.y_valid[m]:
 						accuracy_valid = accuracy_valid + 1
 						# writer.writerow([y_pred_valid, y_pred, self.y_valid[m]])
 				accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
 				writer.writerow([accuracies_valid, accuracies_train])
-				self.acc_valid_online.append(accuracies_valid)
-				self.acc_train_online.append(accuracies_train)
+				# self.acc_valid_online.append(accuracies_valid)
+				# self.acc_train_online.append(accuracies_train)
 
 	def average_perceptron(self):
 		iteration = 15
 		w = np.zeros(len(self.x_train[0]))
 		w_avg = np.zeros(len(self.x_train[0]))
-		w_dec = []
-		w_avg_dec = []
-		for a in xrange(len(w)):
-			try:
-				w_dec.append(Decimal(w[a]))
-				w_avg_dec.append(Decimal(w_avg[a]))
-			except:
-				raise TypeError
-		w_dec = np.array(w_dec)
-		w_avg_dec = np.array(w_avg_dec)
 
 		c = 0
 		c_s = 0
-		with open('valid2.csv', 'wb') as csvfile:
+		with open('valid_avg1.csv', 'wb') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')
 			for i in range(iteration):
 				for j in xrange(len(self.x_train)):
-						u = np.dot(w_dec, self.x_train[j])
+						u = np.dot(w, self.x_train[j])
 						if u < 0.0:
 							u_sign = -1
 						elif u >= 0.0:
 							u_sign = 1
 						if (self.y_train[j]*u_sign) <= 0:
 							if c_s + c > 0:
-								w_avg_dec = (c_s*w_avg_dec + c*w_dec) / (c_s + c)
+								w_avg = (c_s*w_avg + c*w) / (c_s + c)
 							c_s = c_s + c
-							w_dec = w_dec + (self.y_train[j]*self.x_train[j])
+							w = w + (self.y_train[j]*self.x_train[j])
 							c = 0
 						else:
 							c = c+1
 				if c > 0:
-					w_avg_dec = (c_s*w_avg_dec+ c*w_dec) / (c_s + c)
+					w_avg = (c_s*w_avg+ c*w) / (c_s + c)
 
-				self.acc_valid_avg = []
-				self.acc_train_avg = []
+				# self.acc_valid_avg = []
+				# self.acc_train_avg = []
 				accuracy_train = 0
 				accuracy_valid = 0
 				# Determine training accuracy
 				for a in xrange(len(self.x_train)):
-					y_pred_train = self.sign_function(w_avg_dec, self.x_train[a])
+					y_pred_train = self.sign_function(w_avg, self.x_train[a])
 					if y_pred_train == self.y_train[a]:
 						accuracy_train = accuracy_train + 1
 				accuracies_train = float(accuracy_train) / float(len(self.y_train))
 
 				# Determine validation accuracy
 				for m, n in enumerate(self.x_valid):
-					y_pred_valid = self.sign_function(w_avg_dec, self.x_valid[m])
+					y_pred_valid = self.sign_function(w_avg, self.x_valid[m])
 					if y_pred_valid == self.y_valid[m]:
 						accuracy_valid = accuracy_valid + 1
 				accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
-				self.acc_valid_avg.append(accuracies_valid)
-				self.acc_train_avg.append(accuracies_train)
+				# self.acc_valid_avg.append(accuracies_valid)
+				# self.acc_train_avg.append(accuracies_train)
 				writer.writerow([accuracies_valid, accuracies_train])
 
 	def kernel_perceptron(self):
 		alpha = np.zeros(len(self.x_train))
 		K_train = np.zeros((len(self.x_train), len(self.x_train)))
 		K_valid = np.zeros((len(self.x_valid), len(self.x_valid)))
-		alpha_dec = []
-		y_train_dec = []
-		y_valid_dec = []
-
-		for i in xrange(len(self.x_train)):
-			alpha_dec.append(Decimal(alpha[i]))
-			y_train_dec.append(Decimal(self.y_train[i]))
-		for j in xrange(len(self.x_valid)):
-			y_valid_dec.append(Decimal(self.y_valid[j]))
-
-		alpha_dec = np.array(alpha_dec)
-		y_train_dec = np.array(y_train_dec)
-		y_valid_dec = np.array(y_valid_dec)
 
 		p_arr = [1,2,3,7,15]
 		for p in p_arr:
+			print 'p is {}'.format(p)
 			for b in xrange(len(self.x_train)):
 				for c in xrange(len(self.x_train)):
-					# print 'K_train'
-					K_train[b, c] = self.kernel_function(self.x_train[b], self.x_train[c], p)
+					K_train[b, c] = (1 + np.dot(self.x_train[b],self.x_train[c]))**p
 
-			for m in xrange(len(self.x_valid)):
-				for n in xrange(len(self.x_valid)):
-					# print 'K_valid'
-					K_valid[m,n] = self.kernel_function(self.x_valid[m], self.x_train[n], p)
+			# for m in xrange(len(self.x_valid)):
+			# 	for n in xrange(len(self.x_valid)):
+			# 		K_valid[m,n] = (1 + np.dot(self.x_valid[m],self.x_train[n]))**p
 
 			iteration = 15
 			# u = 0
-			for g in range(iteration):
-				accuracy_valid = 0
-				accuracy_train = 0
-				print g
-				for a in xrange(len(self.x_train)):
-					u = np.sign(np.sum(K_train[:,a]*alpha_dec*np.transpose(y_train_dec)))
-					if y_train_dec[a]*u <= 0:
-						alpha_dec[a] += Decimal(1)
+			with open('valid_{}.csv'.format(p), 'wb') as csvfile:
+				for g in range(iteration):
+					accuracy_valid = 0
+					accuracy_train = 0
+					print g
+					for a in xrange(len(self.x_train)):
+						u = np.sign(np.sum(K_train[:,a]*alpha*np.transpose(self.y_train)))
+						if self.y_train[a]*u <= 0:
+							alpha[a] += 1.0
 
-				for c in xrange(len(self.x_train)):
-					y_pred_train = np.sign(np.sum(K_train[:,c]*alpha_dec*np.transpose(y_train_dec)))
-					if y_pred_train == y_train_dec[c]:
-						accuracy_train = accuracy_train + 1
-				accuracies_train = float(accuracy_train) / float(len(y_train_dec))
+					for i in xrange(len(self.x_train)):
+						y_pred_train = np.sign(np.sum(K_train[:,i]*alpha*np.transpose(self.y_train)))
+						if y_pred_train == self.y_train[i]:
+							accuracy_train = accuracy_train + 1.0
+					accuracies_train = float(accuracy_train) / float(len(self.y_train))
 
-				for e in xrange(len(self.x_valid)):
-					y_pred_valid = np.sign(np.sum(K_valid[:,e]*alpha_dec*np.transpose(y_train_dec))) 
-					if y_pred_valid == y_valid_dec[e]:
-						accuracy_valid = accuracy_valid + 1
-				accuracies_valid = float(accuracy_valid) / float(len(y_valid_dec))
-				with open('valid_{}.csv'.format(p), 'wb') as csvfile:
+					y_pred_valid = 0
+					for e in xrange(len(self.x_valid)):
+						for f in xrange(len(self.x_train)):
+							y_pred_valid += ((1 + np.dot(self.x_valid[e],self.x_train[f]))**p)*alpha[f]*self.y_train[f]
+							# y_pred_valid = np.sign(np.sum(K_valid[:,e]*alpha*np.transpose(self.y_train))) 
+						y_pred_valid_sign = np.sign(y_pred_valid)
+						if y_pred_valid_sign == self.y_valid[e]:
+							accuracy_valid = accuracy_valid + 1.0
+					accuracies_valid = float(accuracy_valid) / float(len(self.y_valid))
 					writer = csv.writer(csvfile, delimiter=',')
 					writer.writerow([accuracies_valid, accuracies_train])
 
@@ -196,6 +165,9 @@ class Perceptron():
 
 	def kernel_function(self, x_i, x_j, p):
 		return (1 + np.dot(x_i, x_j))**p
+
+
+	# def prediction(self):
 
 
 if __name__ == '__main__':
