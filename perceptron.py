@@ -122,8 +122,6 @@ class Perceptron():
 				writer.writerow([accuracies_valid, accuracies_train])
 
 	def kernel_perceptron(self):
-		K = []
-		
 		alpha = np.zeros(len(self.x_train))
 		K_train = np.zeros((len(self.x_train), len(self.x_train)))
 		K_valid = np.zeros((len(self.x_valid), len(self.x_valid)))
@@ -156,6 +154,8 @@ class Perceptron():
 			iteration = 15
 			# u = 0
 			for g in range(iteration):
+				accuracy_valid = 0
+				accuracy_train = 0
 				print g
 				for a in xrange(len(self.x_train)):
 					u = np.sign(np.sum(K_train[:,a]*alpha_dec*np.transpose(y_train_dec)))
